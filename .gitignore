@@ -1,0 +1,7 @@
+/build
+/tmp
+/.cache
+test/**/_build
+erl_crash.dump
+/examples/**/build
+/examples/**/gleam.lock

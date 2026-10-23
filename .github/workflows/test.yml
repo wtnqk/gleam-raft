@@ -1,0 +1,42 @@
+# DESIGN §11.4 の手順そのもの。JS ランタイムは Node.js のみ（REQUIREMENTS §7-4）。
+name: test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "29.0"
+          gleam-version: "1.17.0"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - run: gleam format --check
+      - run: gleam deps download
+      - run: gleam check
+      - run: gleam build --target erlang
+      - run: gleam build --target javascript
+      - run: gleam test --target erlang
+      - run: gleam test --target javascript
+
+      # README のサンプルコードをそのまま抽出して実行し、期待出力まで照合する
+      # （M6 手順4。「README 内のコードそのままで動く」を構造で担保）。
+      # Erlang のみ（DESIGN §11.4 のターゲット格付け。ローカルでは
+      # ./scripts/readme_sample.sh javascript でも同じ出力を確認済み）。
+      - name: README sample (extract & run)
+        run: ./scripts/readme_sample.sh erlang
+
+      # 性質テストのスケール実行（DESIGN §11.3: CI 既定 1,000 ケース）。
+      # Erlang のみ（§11.4 のターゲット格付け。JS は上の compat gate で足りる）。
+      # 失敗時の再現は scripts/pbt.sh debug <seed> で行う。
+      - name: Property tests (1,000 cases, Erlang)
+        run: ./scripts/pbt.sh ci
