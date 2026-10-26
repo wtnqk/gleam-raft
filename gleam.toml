@@ -1,8 +1,9 @@
 name = "gleam_raft"
-version = "0.1.0-dev"
+version = "0.1.0"
 description = "Minimal, feature-complete sans-IO Raft library for Gleam (BEAM and JavaScript)."
 gleam = ">= 1.17.0"
 licenses = ["MIT"]
+repository = { type = "github", user = "wtnqk", repo = "gleam-raft" }
 
 # JS ランタイムは Node.js が唯一のサポート（REQUIREMENTS §7-4。Deno は非サポート）。
 [javascript]
